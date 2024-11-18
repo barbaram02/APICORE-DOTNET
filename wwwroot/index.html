@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD API - DOTNET</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <h1>Usuários da API</h1>
+
+
+    <h3>Adicionar Usuários</h3>
+    <form class="form-container" id="addUserForm">
+        <input type="text" id="name" placeholder="Nome" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <button type="submit">Adicionar</button>
+    </form>
+
+    <h3>Lista de Usuários</h3>
+    <ul id="userList"></ul>
+
+    <script>
+        const apiUrl = "https://localhost:5001/api/users"; //URL da API
+
+        //Função para listar os usuários
+        function getUsers(){
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta do servidor');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const userList = document.getElementById('userList');
+                    userList.innerHTML = '';
+                    data.forEach(user => {
+                        userList.innerHTML += 
+                        `<li>${user.name} (${user.email}) <button onclick="deleteUser(${user.id})">Deletar</button></li>`;
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro na função listar usuários:', error);
+                });
+        }
+
+        //Função para adicionar usuário
+        document.getElementById('addUserForm').addEventListener('submit', function(e){
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({name, email})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(() => {
+                getUsers(); //Atualiza a lista de usuários
+                document.getElementById('addUserForm').reset();
+            })
+
+            .catch(error => {
+                console.error('Erro na função adicionar usuários:', error);
+            });
+        });
+
+        //Função para deletar um usuário
+        function deleteUser(id){
+            fetch(`${apiUrl}/${id}`, { method: 'DELETE' })
+                .then(() => getUsers());
+        }
+        //Carregar os usuários ao iniciar a página
+        getUsers();
+    </script>
+</body>
+</html>

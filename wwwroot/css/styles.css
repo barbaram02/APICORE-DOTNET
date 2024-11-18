@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Agdasima:wght@400;700&display=swap');
+
+
+body {
+    display: flex;
+    flex-direction: column; /* Coloca os itens em coluna */
+    justify-content: center; /* Centraliza verticalmente */
+    align-items: center; /* Centraliza horizontalmente */
+    height: 100vh; /* Altura total da janela */
+    margin: 0; /* Remove margens padrão */
+    font-family: Agdasima, sans-serif; /* Fonte padrão */
+    font-size: 1.5em;
+    background-color: rgb(107, 107, 190);
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column; /* Coloca os itens em coluna */
+    gap: 10px; /* Espaçamento entre os campos do formulário */
+    margin-bottom: 20px; /* Espaço abaixo do formulário */
+
+}
+
+#userList li {
+    margin-bottom: 10px; /* Espaçamento entre os itens da lista */
+}
+
+
+button {
+    cursor: pointer; /* Muda o cursor ao passar sobre o botão */
+    background-color: bisque;
+}
+
+button:hover {
+    background-color: #dd9ccf; /* Cor ao passar o mouse */
+}
+
+input{
+    background-color: antiquewhite;
+}
