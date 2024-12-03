@@ -1,50 +1,50 @@
+using Microsoft.EntityFrameworkCore;
+
+// Adicionando o DbContext e configurando a string de conexão
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Defina a string de conexão diretamente na variável
+var bancoDeDados = "Server=WP062692\\SQLEXPRESS,1433;Database=APICOREMAIN;Trusted_Connection=True;TrustServerCertificate=True;";
+
+// Configure o DbContext para usar essa variável
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(bancoDeDados));
+
+// Adicionando os serviços necessários
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
 
-// Adiciona o serviço de CORS com uma política nomeada
+// Configuração do CORS (permite todas as origens, métodos e cabeçalhos)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-    {
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
+              .AllowAnyHeader());
 });
 
-// Adiciona os serviços necessários para os controladores
-builder.Services.AddControllers(); // Adiciona os controladores
-
+// Criando o aplicativo
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configuração do pipeline de requisições
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Permite servir arquivos estáticos da pasta wwwroot
-app.UseStaticFiles();
-
-// Ativa o uso de HTTPS
 app.UseHttpsRedirection();
-
-// Aplica a política de CORS definida com o nome "AllowAll"
+app.UseStaticFiles();
 app.UseCors("AllowAll");
+app.MapControllers();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-// Define o endpoint para obter previsões do tempo (exemplo de endpoint)
+// Exemplo de endpoint para previsão do tempo
 app.MapGet("/weatherforecast", () =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
+    var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+
+    var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
             DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
@@ -57,18 +57,13 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
-// Mapeia os controladores da API
-app.MapControllers(); // Isso mapeia os controladores para serem reconhecidos
-
+// Rodando o aplicativo
 app.Run();
 
-// Classe de previsão do tempo
+// Classe de previsão do tempo (exemplo de endpoint)
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
 
 
-//Endereços da API
-//HTTP: http://localhost:5000
-//HTTPS: https://localhost:5001
