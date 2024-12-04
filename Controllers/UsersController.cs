@@ -18,17 +18,25 @@ namespace ApiCore.Controllers
     public class UsersController:ControllerBase
     {
         //Mock Jason de usuários
-        private static List<User> users = new List<User>
-        {
-            new User { Id = 1, Name = "Bárbara Marcello", Email = "barbaramarcello@example.com"},
-            new User { Id = 2, Name = "Rafael Marcello", Email = "rafaelmarcello@example.com"}
+        //private static List<User> users = new List<User>
+        //{
+        //    new User { Id = 1, Name = "Bárbara Marcello", Email = "barbaramarcello@example.com"},
+        //    new User { Id = 2, Name = "Rafael Marcello", Email = "rafaelmarcello@example.com"}
 
-        };
+        //};
+
+        private readonly AppDbContext _context;
+
+        public UsersController(AppDbContext context)
+        {
+            _context = context;
+        }
 
         //Método Get para listar todos os usuários
         [HttpGet]
         public IActionResult GetUsers()
         {
+            var users = _context.Users.ToList();
             return Ok(users);
         }
 
@@ -36,7 +44,7 @@ namespace ApiCore.Controllers
         [HttpGet("{id}")]
         public IActionResult GetUser(int id)
         {
-            var user = users.FirstOrDefault(u => u.Id == id);
+            var user = _context.Users.FirstOrDefault(u => u.Id == id);
             if (user == null)
             {
                 return NotFound();
@@ -48,22 +56,25 @@ namespace ApiCore.Controllers
         [HttpPost]
         public IActionResult CreateUser([FromBody] User newUser)
         {
-            newUser.Id = users.Count + 1;
-            users.Add(newUser);
-            return CreatedAtAction(nameof(GetUser), new {id = newUser.Id}, newUser);
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+            return CreatedAtAction(nameof(GetUser), new { id = newUser.Id }, newUser);
         }
 
         //Método PUT para atualizar um usuário
         [HttpPut("{id}")]
         public IActionResult UpdateUser(int id, [FromBody] User updateUser)
         {
-            var user = users.FirstOrDefault(u => u.Id == id);
+            var user = _context.Users.FirstOrDefault(u => u.Id == id);
             if (user == null)
             {
                 return NotFound();
             }
+
             user.Name = updateUser.Name;
             user.Email = updateUser.Email;
+
+            _context.SaveChanges();
 
             return NoContent();
         }
@@ -72,12 +83,15 @@ namespace ApiCore.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteUser(int id)
         {
-            var user = users.FirstOrDefault(u => u.Id == id);
+            var user = _context.Users.FirstOrDefault(u => u.Id == id);
             if (user == null)
             {
                 return NotFound();
             }
-            users.Remove(user);
+
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+
             return NoContent();
         }
     }
